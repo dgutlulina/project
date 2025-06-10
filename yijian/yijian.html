@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异间 - 次元社交平台</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <style>
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #7e57c2;
+            --accent: #29b6f6;
+            --light: #f8f0fb;
+            --dark: #2a2a3c;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #fff0f5 0%, #e6f7ff 100%);
+            color: #33334d;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 200, 200, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(200, 230, 255, 0.1) 0%, transparent 20%);
+            min-height: 100vh;
+        }
+        
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px -10px rgba(126, 87, 194, 0.25);
+            border-color: rgba(255, 107, 157, 0.4);
+        }
+        
+        .active-tab {
+            color: rgb(126, 87, 194);
+            border-radius: 20px;
+        }
+        
+        .slider {
+            animation: slide 15s infinite;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        @keyframes slide {
+            0%, 20% { transform: translateX(0); }
+            25%, 45% { transform: translateX(-100%); }
+            50%, 70% { transform: translateX(-200%); }
+            75%, 95% { transform: translateX(-300%); }
+            100% { transform: translateX(0); }
+        }
+        
+        .username-display {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            background: rgba(126, 87, 194, 0.1);
+            border-radius: 9999px;
+            color: var(--secondary);
+            font-weight: 500;
+            margin-right: 0.5rem;
+            border: 1px solid rgba(126, 87, 194, 0.2);
+        }
+        
+        .media-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .media-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .media-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .media-remove:hover {
+            background: rgba(255, 107, 157, 0.8);
+            transform: scale(1.1);
+        }
+        
+        .media-image {
+            width: 344px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .media-video {
+            width: 340px;
+            height: 192px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .media-audio {
+            width: 340px;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        .media-file {
+            width: 340px;
+            background: #f0f0f0;
+            padding: 8px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            font-size: 12px;
+        }
+        
+        .edit-post-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .avatar-upload {
+            position: absolute;
+            opacity: 0;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            bottom: 0;
+            right: 0;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background: #ff5990;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #6d4dc0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(126, 87, 194, 0.3);
+        }
+        
+        .nav-link {
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(126, 87, 194, 0.1);
+            color: var(--secondary);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--primary);
+            transform: translateX(-50%);
+            transition: width 0.3s;
+            border-radius: 3px;
+        }
+        
+        .nav-link:hover::after {
+            width: 60%;
+        }
+        
+        .category-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(126, 87, 194, 0.2);
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #555;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .category-btn:hover {
+            background: rgba(126, 87, 194, 0.1);
+            color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .post-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .post-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .character {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="70" r="40" fill="%23ffb6c1"/><path d="M100 110 Q 150 180, 50 180 Q 100 140, 100 110" fill="%23ffb6c1"/><circle cx="85" cy="65" r="5" fill="%23333"/><circle cx="115" cy="65" r="5" fill="%23333"/><path d="M90 85 Q 100 95, 110 85" stroke="%23333" stroke-width="3" fill="none"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .sakura {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 182, 193, 0.7);
+            border-radius: 50% 50% 0 50%;
+            transform: rotate(-45deg);
+            z-index: -1;
+            opacity: 0.6;
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .heart-btn.active i {
+            color: var(--primary);
+        }
+        
+        .comment-btn.active i {
+            color: var(--accent);
+        }
+        
+        .sakura-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 182, 193, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(200, 230, 255, 0.1) 0%, transparent 20%);
+            z-index: -2;
+        }
+        
+        .header-logo {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        
+        .profile-header {
+            background: linear-gradient(90deg, rgba(255,107,157,0.1), rgba(126,87,194,0.1));
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .tab-button:hover {
+            background: rgba(126, 87, 194, 0.1);
+        }
+        
+        /* 新增的收藏样式 */
+        .favorite-btn.active i {
+            color: rgb(234, 179, 8)
+        }
+        
+        .comment-section {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(240, 240, 240, 0.5);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .comment {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comment:last-child {
+            border-bottom: none;
+        }
+        
+        .comment-input {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        .comment-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .comment-input button {
+            margin-left: 8px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        
+        .comment-input button:hover {
+            background: #0288d1;
+        }
+        .swiper-slide img {
+        width: 100%;  /* 宽度占满容器 */
+        height: 400px;  /* 设置固定高度 */
+        object-fit: cover;  /* 保持图片比例并填充 */
+        border-radius: 0.75rem;  /* 圆角 */
+    }
+    
+    /* 新增样式：好友列表 */
+    .friend-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        background: rgba(255,255,255,0.7);
+        transition: all 0.3s;
+    }
+    
+    .friend-item:hover {
+        background: rgba(126,87,194,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .friend-item img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+        border: 2px solid var(--primary);
+    }
+    
+    .friend-info {
+        flex: 1;
+    }
+    
+    .friend-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .friend-action-btn {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .message-btn {
+        background: var(--accent);
+        color: white;
+        border: none;
+    }
+    
+    .message-btn:hover {
+        background: #0288d1;
+    }
+    
+    .unfollow-btn {
+        background: rgba(255,107,157,0.1);
+        color: var(--primary);
+        border: 1px solid var(--primary);
+    }
+    
+    .unfollow-btn:hover {
+        background: rgba(255,107,157,0.2);
+    }
+    
+    .follow-btn {
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .follow-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(126, 87, 194, 0.3);
+    }
+    /* 消息模态框样式 */
+    .message-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 500px;
+        height: 80vh;
+        background: white;
+        border-radius: 16px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+    
+    .message-header {
+        padding: 15px 20px;
+        background: var(--primary);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .message-content {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #f9f9f9;
+    }
+    
+    .message-input-container {
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #eee;
+        display: flex;
+    }
+    
+    .message-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+    }
+    
+    .send-btn {
+        margin-left: 10px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    
+    .send-btn:hover {
+        background: #ff5990;
+    }
+    
+    .message {
+        margin-bottom: 15px;
+        max-width: 80%;
+    }
+    
+    .message.sent {
+        margin-left: auto;
+        text-align: right;
+    }
+    
+    .message.received {
+        margin-right: auto;
+    }
+    
+    .message-bubble {
+        padding: 10px 15px;
+        border-radius: 18px;
+        display: inline-block;
+    }
+    
+    .sent .message-bubble {
+        background: var(--primary);
+        color: white;
+        border-top-right-radius: 4px;
+    }
+    
+    .received .message-bubble {
+        background: #e6e6e6;
+        color: #333;
+        border-top-left-radius: 4px;
+    }
+    
+    .message-time {
+        font-size: 11px;
+        color: #888;
+        margin-top: 5px;
+    }
+    
+    /* 关注按钮 */
+    .follow-container {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+    }
+    
+    .follow-status {
+        font-size: 12px;
+        color: var(--secondary);
+        margin-left: 8px;
+    }
+    .swiper-button-next,
+    .swiper-button-prev { 
+        color: #f6eeee;
+    }   
+    
+    /* 新增样式：修复图片显示问题 */
+    .post-image {
+        width: 100%;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 12px ;
+        margin-bottom: 16px;
+    }
+    
+    .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .profile-post-card {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .empty-state {
+        padding: 30px;
+        text-align: center;
+        background: rgba(255,255,255,0.5);
+        border-radius: 16px;
+        border: 2px dashed rgba(126, 87, 194, 0.2);
+    }
+    
+    .empty-state i {
+        font-size: 48px;
+        color: rgba(126, 87, 194, 0.3);
+        margin-bottom: 16px;
+    }
+    
+    .empty-state p {
+        color: #666;
+        margin-bottom: 8px;
+    }
+.w-full {
+    width: 340px !important; /* 设置宽度为340px */
+}
+.commentWindow {
+  width: 448px !important; /* 设置评论窗口宽度 */
+}
+.LogIn {
+    width: 600px !important;   /* 设置登录窗口宽度为100% */
+}
+.editContent {
+    width: 260px !important;
+}
+    </style>
+</head>
+
+<body class="min-h-screen relative">
+    <!-- 樱花飘落效果 -->
+    <div class="sakura-bg"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="header-logo">
+                <i class="fas fa-cloud-moon mr-2"></i>异间 - 次元社交平台
+            </div>
+            <div class="hidden md:flex space-x-2 items-center">
+                <a href="#home" class="text-gray-700 nav-link" onclick="returnToHome()">首页</a>
+                <a href="#profile" class="text-gray-700 nav-link" onclick="navigateToProfile(event)">个人空间</a>
+                
+                <!-- 用户名显示区域 -->
+                <div id="usernameDisplay" class="username-display hidden">
+                    <i class="fas fa-user"></i>
+                    <span id="usernameText"></span>
+                </div>
+                
+                <!-- 登录/退出按钮 -->
+                <button id="authButton" onclick="showLoginModal()" class="btn-primary">
+                    登录/注册
+                </button>
+                <button id="logoutButton" onclick="logout()" class="btn-secondary hidden">
+                    退出登录
+                </button>
+            </div>
+            <button class="md:hidden text-gray-600 focus:outline-none" id="mobileMenuButton" aria-label="导航菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 移动端菜单 -->
+    <div class="md:hidden hidden bg-white/90 backdrop-blur-md shadow-lg rounded-lg mt-2 mx-4 py-2 absolute right-0 left-0 z-40" id="mobileMenu">
+        <a href="#home" class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" onclick="returnToHome()">首页</a>
+        <a href="#profile" class="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" onclick="navigateToProfile(event)">个人空间</a>
+        
+        <!-- 移动端用户名显示 -->
+        <div id="mobileUsernameDisplay" class="block px-4 py-2 text-indigo-600 hidden">
+            <i class="fas fa-user mr-2"></i>
+            <span id="mobileUsernameText"></span>
+        </div>
+        
+        <!-- 移动端登录/退出按钮 -->
+        <button id="mobileAuthButton" onclick="showLoginModal()" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
+            登录/注册
+        </button>
+        <button id="mobileLogoutButton" onclick="logout()" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 hidden">
+            退出登录
+        </button>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" id="loginModal">
+        <div class="LogIn glassmorphism p-8 rounded-xl w-full max-w-md relative">
+            <div class="character floating" style="right:-30px; bottom:-30px;"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">加入异次元世界</h3>
+                <button onclick="hideLoginModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">昵称</label>
+                <input type="text" id="username" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="输入你的二次元昵称">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 mb-2">密码</label>
+                <input type="password" id="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="输入密码">
+            </div>
+            <button onclick="login()" class="w-full btn-primary">
+                进入异次元
+            </button>
+            <div class="mt-4 text-center text-sm text-gray-600">
+                加入我们，与同好一起探索二次元世界！
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <main class="container mx-auto px-4 py-8" id="home">
+        <!-- 轮播图 -->
+        <div class="relative overflow-hidden rounded-xl mb-8 h-64 md:h-96">
+            <!-- Swiper -->
+            
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="image/孤独摇滚.png" alt="动漫图片1"></div>
+                    <div class="swiper-slide"><img src="image/凤舞.png" alt="动漫图片2"></div>
+                    <div class="swiper-slide"><img src="image/鬼灭.png" alt="动漫图片3"></div>
+                    <div class="swiper-slide"><img src="image/时光代理人.jpg" alt="动漫图片4"></div>
+                    <div class="swiper-slide"><img src="image/游戏人生.png" alt="动漫图片5"></div>
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+
+        <!-- 帖子分类 -->
+        <div class="flex overflow-x-auto mb-8 pb-2 space-x-2">
+            <button onclick="filterPosts('all')" class="category-btn active">全部</button>
+            <button onclick="filterPosts('hot')" class="category-btn">热门</button>
+            <button onclick="filterPosts('new')" class="category-btn">最新</button>
+            <button onclick="filterPosts('anime')" class="category-btn">动漫</button>
+            <button onclick="filterPosts('game')" class="category-btn">游戏</button>
+            <button onclick="filterPosts('cos')" class="category-btn">COS</button>
+            <button onclick="filterPosts('art')" class="category-btn">同人</button>
+        </div>
+
+        <!-- 帖子列表 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="postsContainer">
+            <!-- 帖子将通过JavaScript动态渲染 -->
+        </div>
+    </main>
+
+    <!-- 个人空间 -->
+    <div class="container mx-auto px-4 py-8 hidden" id="profile">
+        <!-- 已移除返回首页按钮 -->
+        
+        <div class="profile-header glassmorphism p-6 mb-8">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="relative mb-4 md:mb-0 md:mr-6">
+                    <img id="userAvatar" src="https://randomuser.me/api/portraits/women/65.jpg" alt="用户头像" class="w-24 h-24 rounded-full border-2 border-white shadow-md">
+                    <button class="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="avatarUpload" accept="image/*" class="avatar-upload" onchange="uploadAvatar(event)">
+                    </button>
+                </div>
+                <div class="flex-grow">
+                    <h2 id="profileTitle" class="text-2xl font-bold mb-2 text-gray-800">我的次元空间</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-1">个人简介</label>
+                        <textarea id="profileBio" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" placeholder="分享你的二次元故事..."></textarea>
+                    </div>
+                    <button onclick="saveProfile()" class="btn-primary">保存修改</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">            
+            <div class="flex border-b">
+                <button onclick="switchTab('myPosts')" class="tab-button active-tab px-4 py-2 font-medium">我的帖子</button>
+                <button onclick="switchTab('likedPosts')" class="tab-button px-4 py-2 font-medium text-gray-600">我喜欢的</button>
+                <button onclick="switchTab('favoritePosts')" class="tab-button px-4 py-2 font-medium text-gray-600">我的收藏</button>
+                <button onclick="switchTab('friendsTab')" class="tab-button px-4 py-2 font-medium text-gray-600">好友列表</button>
+            </div>
+        </div>
+
+        <!-- 我的帖子 -->
+        <div id="myPosts">
+            <div class="glassmorphism p-6 mb-6">
+                <div class="flex items-center mb-4">
+                    <img id="postAvatar" src="https://randomuser.me/api/portraits/women/65.jpg" alt="用户头像" class="w-10 h-10 rounded-full mr-3 border border-white">
+                    <input type="text" id="newPostContent" placeholder="分享你的次元想法..." class="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                
+<!-- 多媒体上传区域 -->
+<div class="flex justify-between items-center mb-4">
+    <div class="flex space-x-2">
+        <button class="text-gray-500 hover:text-indigo-500 p-2" onclick="document.getElementById('imageUpload').click()">
+            <i class="fas fa-image"></i>
+            <input type="file" id="imageUpload" accept="image/*" multiple class="hidden" onchange="handleMediaUpload(event, 'image')">
+        </button>
+        <button class="text-gray-500 hover:text-indigo-500 p-2" onclick="document.getElementById('videoUpload').click()">
+            <i class="fas fa-video"></i>
+            <input type="file" id="videoUpload" accept="video/*" multiple class="hidden" onchange="handleMediaUpload(event, 'video')">
+        </button>
+        <button class="text-gray-500 hover:text-indigo-500 p-2" onclick="document.getElementById('audioUpload').click()">
+            <i class="fas fa-music"></i>
+            <input type="file" id="audioUpload" accept="audio/*" multiple class="hidden" onchange="handleMediaUpload(event, 'audio')">
+        </button>
+        <button class="text-gray-500 hover:text-indigo-500 p-2" onclick="document.getElementById('fileUpload').click()">
+            <i class="fas fa-paperclip"></i>
+            <input type="file" id="fileUpload" multiple class="hidden" onchange="handleMediaUpload(event, 'file')">
+        </button>
+
+    </div>
+</div>
+                
+                <!-- 媒体预览区域 -->
+                <div id="mediaPreview" class="media-preview"></div>
+                
+                <div class="flex justify-end mt-4">
+                    <button onclick="createPost()" class="btn-primary">发布</button>
+                </div>
+            </div>
+
+            <!-- 已发布的帖子 -->
+            <div id="userPostsContainer">
+                <!-- 用户帖子将通过JavaScript动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 我喜欢的帖子 -->
+        <div id="likedPosts" class="hidden">
+            <div id="likedPostsContainer" class="profile-grid">
+                <!-- 喜欢的帖子将通过JavaScript动态渲染 -->
+            </div>
+        </div>
+        
+        <!-- 我的收藏 -->
+        <div id="favoritePosts" class="hidden">
+            <div id="favoritePostsContainer" class="profile-grid">
+                <!-- 收藏的帖子将通过JavaScript动态渲染 -->
+            </div>
+        </div>
+        
+        <!-- 好友列表 -->
+        <div id="friendsTab" class="hidden">
+            <div class="glassmorphism p-6 mb-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">我的好友</h3>
+                <div id="friendsList">
+                    <!-- 好友列表将通过JavaScript动态渲染 -->
+                </div>
+            </div>
+            
+            <div class="glassmorphism p-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">推荐好友</h3>
+                <div id="suggestedFriends">
+                    <!-- 推荐好友将通过JavaScript动态渲染 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑帖子模态框 -->
+    <div class="edit-post-modal hidden" id="editPostModal">
+        <div class="glassmorphism p-8 rounded-xl w-full max-w-md relative">
+            <div class="character floating" style="right:-30px; bottom:-30px;"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">编辑帖子</h3>
+                <button onclick="hideEditModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <textarea id="editPostContent" class="editContent w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="4" placeholder="编辑你的次元故事..."></textarea>
+            </div>
+            <div id="editMediaPreview" class="media-preview mb-4"></div>
+            <div class="flex justify-end space-x-2">
+                <button onclick="hideEditModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">取消</button>
+                <button onclick="saveEditedPost()" class="btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评论模态框 -->
+    <div class="edit-post-modal hidden" id="commentModal">
+
+        <div class="commentWindow glassmorphism p-8 rounded-xl w-full max-w-md relative">
+            <div class="character floating" style="right:-30px; bottom:-30px;"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">评论详情</h3>
+                <button onclick="hideCommentModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="commentContent" class="mb-4 p-4 bg-gray-50 rounded-lg">
+                <!-- 帖子内容将通过JavaScript动态渲染 -->
+            </div>
+            <div class="comment-section" id="commentSection">
+                <!-- 评论列表将通过JavaScript动态渲染 -->
+            </div>
+            <div class="comment-input mt-4">
+                <input type="text" id="newComment" placeholder="输入你的评论..." class="flex-grow">
+                <button onclick="addComment()" class="btn-primary">发送</button>
+            </div>
+        </div>
+
+
+    </div>
+    
+    <!-- 消息模态框 -->
+    <div class="edit-post-modal hidden" id="messageModal">
+        <div class="message-modal">
+            <div class="message-header">
+                <h3 id="messageFriendName" class="text-xl font-bold">与好友聊天</h3>
+                <button onclick="hideMessageModal()" class="text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="message-content" id="messageContent">
+                <!-- 消息内容将通过JavaScript动态渲染 -->
+            </div>
+            <div class="message-input-container">
+                <input type="text" id="messageInput" class="message-input" placeholder="输入消息...">
+                <button onclick="sendMessage()" class="send-btn">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        // 全局帖子数据
+let                  allPosts = [
+                    {
+                        id: 'post1',
+                        srcHeader: "image/顾飞头像.png",
+                        author: '小兔子乖乖',
+                        time: '30分钟前',
+                        content: '小兔子乖乖~猫丞丞真可爱~',
+                        src: "image/撒野.png",
+                        heart: '1200',
+                        comment: '2',
+                        share: '89',
+                        category: 'art',
+                        media: [],
+                        comments: [
+                            {
+                                id: 'comment1-1',
+                                src: "image/顾淼头像.png",
+                                uname: '顾淼',
+                                comment: '嫂子。',
+                                time: '1分钟前'
+                            },
+                            {
+                                id: 'comment1-2',
+                                src: "image/蒋丞头像.png",
+                                uname: '蒋丞',
+                                comment: '傻逼吧你顾飞',
+                                time: '20分钟前'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'post2',
+                        srcHeader: "image/头像2.jpg",
+                        author: 'cosplay爱好者',
+                        time: '2小时前',
+                        content: '这是我的第一个cosplay，扮演的是尼克斯，大家觉得怎么样？',
+                        src: "image/头像2.jpg",
+                        heart: '245',
+                        comment: '2',
+                        share: '189',
+                        category: 'cos',
+                        media: [],
+                        comments: [
+                            {
+                                id: 'comment2-1',
+                                src: "image/头像1.jpg",
+                                uname: '原神玩家',
+                                comment: '还原度太高了吧！',
+                                time: '1小时前'
+                            },
+                            {
+                                id: 'comment2-2',
+                                src: "image/头像6.jpg",
+                                uname: '摄影爱好者',
+                                comment: '光线和构图都超棒！',
+                                time: '45分钟前'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'post3',
+                        srcHeader: "image/头像1.jpg",
+                        author: '漫评人',
+                        time: '2小时前',
+                        content: '给大家分享一个超级可爱的宝宝,是漫画《满溢之血》里面的',
+                        src: "image/bb.jpg",
+                        heart: '189',
+                        comment: '2',
+                        share: '89',
+                        category: 'art',
+                        media: [],
+                        comments: [
+                            {
+                                id: 'comment3-1',
+                                src: "image/头像7.jpg",
+                                uname: '求太太更文',
+                                comment: '啊啊啊啊！！！！！！！！宝宝好可爱啊！',
+                                time: '1小时前'
+                            },
+                            {
+                                id: 'comment3-2',
+                                src: "image/头像8.jpg",
+                                uname: '想7饭',
+                                comment: '好可爱的画风啊！！在哪里可以看这个漫画啊？',
+                                time: '30分钟前'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'post4',
+                        srcHeader: "image/头像3.jpg",
+                        author: '游戏达人',
+                        time: '3小时前',
+                        content: '《塞尔达传说：王国之泪》通关啦！历时85小时，有什么问题尽管问~',
+                        src: "image/塞尔达.jpg",
+                        heart: '328',
+                        comment: '2',
+                        share: '256',
+                        category: 'game',
+                        media: [],
+                        comments: [
+                            {
+                                id: 'comment4-1',
+                                src: "image/头像9.jpg",
+                                uname: '林克爱好者',
+                                comment: '大佬求通关攻略！',
+                                time: '2小时前'
+                            },
+                            {
+                                id: 'comment4-2',
+                                src: "image/头像10.jpg",
+                                uname: '塞尔达公主',
+                                comment: '这么快就通关了？我才玩到一半',
+                                time: '1小时前'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'post5',
+                        srcHeader: "image/头像4.jpg",
+                        author: '画师小白',
+                        time: '5小时前',
+                        content: '第一次尝试画二次元人物，临摹了《鬼灭之刃》的炭治郎，请大佬们指教！',
+                        src: "image/炭治郎.jpg",
+                        heart: '488',
+                        comment: '2',
+                        share: '321',
+                        category: 'art',
+                        media: [],
+                        comments: [
+                            {
+                                id: 'comment5-1',
+                                src: "image/头像11.jpg",
+                                uname: '美术老师',
+                                comment: '线条处理得很好，继续加油！',
+                                time: '3小时前'
+                            },
+                            {
+                                id: 'comment5-2',
+                                src: "image/炭治郎本郎.jpg",
+                                uname: '炭治郎本郎',
+                                comment: '画得比我本人还帅哈哈',
+                                time: '2小时前'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'post6',
+                        srcHeader: "image/头像5.jpg",
+                        author: '新番追踪',
+                        time: '1天前',
+                        content: '四月新番推荐！《我推的孩子》第一集就封神，大家看了吗？',
+                        src: "image/我推的孩子.jpg",
+                        heart: '589',
+                        comment: '2',
+                        share: '456',
+                        category: 'anime',
+                        media: [],
+                        comments: [
+                            {
+                                id: 'comment6-1',
+                                src: "image/头像12.jpg",
+                                uname: '动漫宅',
+                                comment: '第一集90分钟直接看哭！',
+                                time: '20小时前'
+                            },
+                            {
+                                id: 'comment6-2',
+                                src: "image/头像13.jpg",
+                                uname: '星野爱',
+                                comment: '我是偶像我推的孩子~',
+                                time: '18小时前'
+                            }
+                        ]
+                    }
+                ];
+                  
+        
+        // 用户数据
+        let userData = {
+            username: '',
+            avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
+            bio: '',
+            posts: [],
+            likedPosts: [],
+            favoritePosts: [],
+            following: [], // 关注的用户
+            followers: [], // 粉丝
+            messages: {}   // 消息存储
+        };
+
+        // 模拟用户数据
+        const mockUsers = [
+            { username: '小兔子乖乖', avatar: 'image/顾飞头像.png' },
+            { username: 'cosplay爱好者', avatar: 'image/头像2.jpg' },
+            { username: '漫评人', avatar: 'image/头像1.jpg' },
+            { username: '游戏达人', avatar: 'image/头像3.jpg' },
+            { username: '画师小白', avatar: 'image/头像4.jpg' },
+            { username: '新番追踪', avatar: 'image/头像5.jpg' }
+        ];
+
+        // 当前筛选类别
+        let currentFilter = 'all';
+        // 当前上传的媒体文件
+        let currentMedia = [];
+        // 当前编辑的帖子ID
+        let currentEditPostId = null;
+        // 当前查看评论的帖子ID
+        let currentCommentPostId = null;
+        // 当前聊天好友
+        let currentFriend = null;
+
+        // 初始化页面
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllPosts();
+    checkLoginStatus();
+    renderPosts();
+    
+    // 初始化Swiper
+    const swiper = new Swiper(".mySwiper", {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: true,
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        },
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+        },
+        effect: 'fade',
+        fadeEffect: {
+            crossFade: true
+        },
+        speed: 1000 // 设置切换速度为1秒
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+
+            // 点击导航链接后关闭移动端菜单
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+                // 同时切换图标回汉堡按钮
+                const menuIcon = document.querySelector('#mobileMenuButton i');
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+            }
+        });
+    });
+
+    // 移动端导航菜单切换
+    const menuButton = document.getElementById('mobileMenuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    menuButton.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+
+        // 切换图标
+        const icon = this.querySelector('i');
+        if (!mobileMenu.classList.contains('hidden')) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+
+    // 点击页面其他区域关闭移动端菜单
+    document.addEventListener('click', function(event) {
+        const isClickInsideNav = document.querySelector('nav').contains(event.target);
+
+        if (!isClickInsideNav && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            const icon = menuButton.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+    
+    // 创建随机樱花效果
+    createSakura();
+});       
+        // 创建樱花效果
+        function createSakura() {
+            const container = document.querySelector('.sakura-bg');
+            for (let i = 0; i < 20; i++) {
+                const sakura = document.createElement('div');
+                sakura.className = 'sakura floating';
+                sakura.style.left = `${Math.random() * 100}%`;
+                sakura.style.top = `${Math.random() * 100}%`;
+                sakura.style.animationDelay = `${Math.random() * 5}s`;
+                sakura.style.transform = `scale(${0.5 + Math.random()})`;
+                sakura.style.opacity = `${0.3 + Math.random() * 0.4}`;
+                container.appendChild(sakura);
+            }
+        }
+
+        // 返回首页功能
+function returnToHome() {
+    // 显示首页，隐藏个人空间
+    document.getElementById('home').classList.remove('hidden');
+    document.getElementById('profile').classList.add('hidden');
+    
+    // 刷新首页帖子列表
+    renderPosts();
+    
+    // 重新初始化 Swiper
+    const swiper = new Swiper(".mySwiper", {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: true,
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        },
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+        },
+        effect: 'fade',
+        fadeEffect: {
+            crossFade: true
+        },
+        speed: 1000
+    });
+    
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+        // 初始化 IndexedDB
+        function initIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('YiJianDB', 1);
+                
+                request.onsuccess = (event) => {
+                    resolve(event.target.result);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    // 用户数据存储
+                    if (!db.objectStoreNames.contains('users')) {
+                        const userStore = db.createObjectStore('users', { keyPath: 'username' });
+                        userStore.createIndex('username', 'username', { unique: true });
+                    }
+                    
+                    // 帖子数据存储
+                    if (!db.objectStoreNames.contains('posts')) {
+                        const postStore = db.createObjectStore('posts', { keyPath: 'id' });
+                        postStore.createIndex('id', 'id', { unique: true });
+                    }
+                    
+                    // 媒体文件存储
+                    if (!db.objectStoreNames.contains('media')) {
+                        const mediaStore = db.createObjectStore('media', { keyPath: 'id' });
+                        mediaStore.createIndex('id', 'id', { unique: true });
+                    }
+                    
+                    resolve(db);
+                };
+            });
+        }
+
+        // 从 IndexedDB 加载所有帖子
+async function loadAllPosts() {
+    const dbPromise = initIndexedDB();
+    const db = await dbPromise;
+    const transaction = db.transaction(['posts'], 'readwrite');
+    const postStore = transaction.objectStore('posts');
+    const request = postStore.getAll();
+    
+    request.onsuccess = (event) => {
+        allPosts = [...allPosts, ...event.target.result || []]
+            .sort((a, b) => new Date(b.time) - new Date(a.time));
+        
+        // 去重（按ID）
+        const uniquePosts = {};
+        allPosts.forEach(post => {
+            uniquePosts[post.id] = post;
+        });
+        allPosts = Object.values(uniquePosts);
+        
+        updatePostsInMemory();
+    };
+    
+    transaction.oncomplete = () => {
+        updatePostsInMemory();
+    };
+}  
+// 更新内存中的帖子数据
+        function updatePostsInMemory() {
+            // 初始化帖子的 comments 数目
+            allPosts.forEach(post => {
+                post.comments = post.comments || [];
+                post.comment = post.comments.length.toString();
+            });
+        }
+
+        // 更新认证UI状态
+        function updateAuthUI(isLoggedIn) {
+            if (isLoggedIn) {
+                // 桌面端UI更新
+                document.getElementById('authButton').classList.add('hidden');
+                document.getElementById('logoutButton').classList.remove('hidden');
+                document.getElementById('usernameDisplay').classList.remove('hidden');
+                document.getElementById('usernameText').textContent = userData.username;
+                
+                // 移动端UI更新
+                document.getElementById('mobileAuthButton').classList.add('hidden');
+                document.getElementById('mobileLogoutButton').classList.remove('hidden');
+                document.getElementById('mobileUsernameDisplay').classList.remove('hidden');
+                document.getElementById('mobileUsernameText').textContent = userData.username;
+                
+                // 更新个人空间标题
+                document.getElementById('profileTitle').textContent = `${userData.username}的次元空间`;
+                document.getElementById('profileBio').value = userData.bio || '';
+                document.getElementById('userAvatar').src = userData.avatar;
+                document.getElementById('postAvatar').src = userData.avatar;
+                
+                // 渲染用户帖子
+                renderUserPosts();
+                renderLikedPosts();
+                renderFavoritePosts();
+                renderFriendsList();
+                renderSuggestedFriends();
+            } else {
+                // 桌面端UI更新
+                document.getElementById('authButton').classList.remove('hidden');
+                document.getElementById('logoutButton').classList.add('hidden');
+                document.getElementById('usernameDisplay').classList.add('hidden');
+                
+                // 移动端UI更新
+                document.getElementById('mobileAuthButton').classList.remove('hidden');
+                document.getElementById('mobileLogoutButton').classList.add('hidden');
+                document.getElementById('mobileUsernameDisplay').classList.add('hidden');
+                
+                // 更新个人空间标题
+                document.getElementById('profileTitle').textContent = '我的次元空间';
+                document.getElementById('profileBio').value = '';
+            }
+        }
+
+        // 显示登录模态框
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        // 隐藏登录模态框
+        function hideLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        // 登录功能
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('请输入用户名和密码');
+                return;
+            }
+            
+            userData = {
+                username: username,
+                avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
+                bio: '',
+                posts: [],
+                likedPosts: [],
+                favoritePosts: [],
+                following: [],
+                followers: [],
+                messages: {}
+            };
+            
+            updateAuthUI(true);
+            hideLoginModal();
+            
+            // 显示欢迎消息
+            setTimeout(() => {
+                alert(`欢迎来到异次元世界，${username}！`);
+                
+                // 切换到个人空间
+                navigateToProfile();
+                
+                // 重新渲染所有相关内容
+                renderUserPosts();
+                renderLikedPosts();
+                renderFavoritePosts();
+                renderFriendsList();
+                renderSuggestedFriends();
+            }, 300);
+        }
+
+        // 退出登录
+        function logout() {
+            userData = {
+                username: '',
+                avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
+                bio: '',
+                posts: [],
+                likedPosts: [],
+                favoritePosts: [],
+                following: [],
+                followers: [],
+                messages: {}
+            };
+            
+            updateAuthUI(false);
+            
+            // 刷新页面
+            window.location.reload();
+        }
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            updateAuthUI(!!userData.username);
+        }
+
+        // 导航到个人空间（新增函数）
+        function navigateToProfile(event) {
+            if (event) event.preventDefault();
+            
+            if (!userData.username) {
+                showLoginModal();
+                alert('请先登录后再访问个人空间');
+                return;
+            }
+            
+            // 隐藏首页，显示个人空间
+            document.getElementById('home').classList.add('hidden');
+            document.getElementById('profile').classList.remove('hidden');
+            
+            // 刷新个人空间内容
+            renderUserPosts();
+            renderLikedPosts();
+            renderFavoritePosts();
+            renderFriendsList();
+            renderSuggestedFriends();
+            
+            // 确保"我的帖子"标签处于激活状态
+            switchTab('myPosts');
+        }
+
+        // 保存个人资料
+        function saveProfile() {
+            const bio = document.getElementById('profileBio').value;
+            userData.bio = bio;
+            
+            alert('个人资料已保存');
+        }
+
+        // 上传头像
+        function uploadAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                userData.avatar = e.target.result;
+                
+                document.getElementById('userAvatar').src = e.target.result;
+                document.getElementById('postAvatar').src = e.target.result;
+                alert('头像上传成功');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 显示文件预览
+function previewFiles() {
+    // 触发文件选择对话框
+    document.getElementById('imageUpload').click();
+}
+
+// 处理媒体上传
+function handleMediaUpload(event, type) {
+    const files = event.target.files;
+    const preview = document.getElementById('mediaPreview');
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const mediaItem = document.createElement('div');
+            mediaItem.className = 'media-item';
+            
+            const removeBtn = document.createElement('div');
+            removeBtn.className = 'media-remove';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.onclick = function() {
+                mediaItem.remove();
+                currentMedia = currentMedia.filter(m => m.url !== e.target.result);
+            };
+            
+            let mediaElement;
+            if (type === 'image') {
+                mediaElement = document.createElement('img');
+                mediaElement.className = 'media-image';
+                mediaElement.src = e.target.result;
+            } else if (type === 'video') {
+                mediaElement = document.createElement('video');
+                mediaElement.className = 'media-video';
+                mediaElement.src = e.target.result;
+                mediaElement.controls = true;
+            } else if (type === 'audio') {
+                mediaElement = document.createElement('div');
+                mediaElement.className = 'media-audio';
+                mediaElement.innerHTML = `<i class="fas fa-music mr-2"></i>${file.name.substring(0, 10)}...`;
+            } else {
+                mediaElement = document.createElement('div');
+                mediaElement.className = 'media-file';
+                mediaElement.innerHTML = `<i class="fas fa-file mr-2"></i>${file.name.substring(0, 10)}...`;
+            }
+            
+            mediaItem.appendChild(mediaElement);
+            mediaItem.appendChild(removeBtn);
+            preview.appendChild(mediaItem);
+            
+            currentMedia.push({
+                type: type,
+                url: e.target.result,
+                name: file.name
+            });
+        };
+        
+        reader.readAsDataURL(file);
+    }
+    
+    // 重置文件输入
+    event.target.value = '';
+}
+        // 创建新帖子
+function createPost() {
+    const content = document.getElementById('newPostContent').value;
+    if (!content && currentMedia.length === 0) {
+        alert('请输入帖子内容或上传媒体文件');
+        return;
+    }
+
+    // 获取第一张图片作为帖子主图
+    const firstImage = currentMedia.find(media => media.type === 'image');
+    
+    const newPost = {
+        id: `post-${Date.now()}`,
+        srcHeader: userData.avatar,
+        author: userData.username,
+        time: '刚刚',
+        content: content,
+        src: firstImage ? firstImage.url : "", // 设置第一张图片为主图
+        heart: '0',
+        comment: '0',
+        share: '0',
+        category: 'new',
+        // 如果有主图,则从media数组中移除第一张图片
+        media: firstImage ? currentMedia.slice(1) : currentMedia,
+        comments: []
+    };
+
+    // 保存帖子到内存
+    allPosts.unshift(newPost);
+    
+    // 重置表单
+    document.getElementById('newPostContent').value = '';
+    document.getElementById('mediaPreview').innerHTML = '';
+    currentMedia = [];
+    
+    alert('帖子发布成功！');
+    
+    // 刷新个人空间的帖子列表，不再跳转
+    renderUserPosts();
+    
+    // 如果需要，滚动到新发布的帖子位置
+    const userPostsContainer = document.getElementById('userPostsContainer');
+    if (userPostsContainer) {
+        userPostsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}      
+// 渲染帖子
+function renderPosts() {
+    const postsContainer = document.getElementById('postsContainer');
+    postsContainer.innerHTML = '';
+
+    let filteredPosts = allPosts;
+    
+    // 根据当前筛选条件过滤帖子
+    if (currentFilter !== 'all') {
+        filteredPosts = allPosts.filter(post => {
+            if (currentFilter === 'hot') return parseInt(post.heart.replace('k', '')) * (post.heart.includes('k') ? 1000 : 1) > 1000;
+            if (currentFilter === 'new') return post.category === 'new';
+            return post.category === currentFilter;
+        });
+    }
+
+    filteredPosts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'glassmorphism p-6 card-hover post-card';
+        
+        // 检查当前用户是否关注了该帖子的作者
+        const isFollowing = userData.following.includes(post.author);
+        
+        postElement.innerHTML = `
+            <div class="flex items-center mb-4">
+                <img src="${post.srcHeader}" alt="用户头像" class="w-10 h-10 rounded-full mr-3 border border-white">
+                <div class="flex-1">
+                    <p class="font-medium text-gray-800">${post.author}</p>
+                    <p class="text-xs text-gray-500">${post.time}</p>
+                </div>
+                ${userData.username && userData.username !== post.author ? `
+                <div class="follow-container">
+                    <button onclick="toggleFollow('${post.author}')" class="follow-btn ${isFollowing ? 'unfollow-btn' : ''}">
+                        ${isFollowing ? '取消关注' : '关注'}
+                    </button>
+                    
+                </div>
+                ` : ''}
+            </div>
+            ${post.content ? `<p class="text-gray-700 mb-4">${post.content}</p>` : ''}
+            ${post.src ? `<img src="${post.src}" alt="帖子图片" class="w-full h-48 object-cover rounded-lg mb-4 post-image">` : ''}
+            ${renderMediaPreview(post.media)}
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-4">
+                    <button onclick="toggleLike(this, '${post.id}')" class="flex items-center text-gray-500 hover:text-red-500 heart-btn ${userData.likedPosts.some(p => p.id === post.id) ? 'active' : ''}">
+                        <i class="${userData.likedPosts.some(p => p.id === post.id) ? 'fas text-red-500' : 'far'} fa-heart mr-1"></i>
+                        <span>${post.heart}</span>
+                    </button>
+                    <button onclick="showCommentModal('${post.id}')" class="flex items-center text-gray-500 hover:text-indigo-500 comment-btn">
+                        <i class="far fa-comment mr-1"></i>
+                        <span>${post.comment}</span>
+                    </button>
+                </div>
+                <button onclick="toggleFavorite(this, '${post.id}')" class="text-gray-500 hover:text-yellow-500 favorite-btn ${userData.favoritePosts.some(p => p.id === post.id) ? 'active' : ''}">
+                    <i class="${userData.favoritePosts.some(p => p.id === post.id) ? 'fas text-yellow-500' : 'far'} fa-bookmark"></i>
+                </button>
+            </div>
+        `;
+        postsContainer.appendChild(postElement);
+    });
+}
+// 渲染媒体预览
+        function renderMediaPreview(media) {
+            if (!media || media.length === 0) return '';
+            
+            let html = '<div class="media-preview mb-4">';
+            media.forEach(item => {
+                html += '<div class="media-item">';
+                if (item.type === 'image') {
+                    html += `<img src="${item.url}" alt="图片" class="media-image">`;
+                } else if (item.type === 'video') {
+                    html += `<video src="${item.url}" controls class="media-video"></video>`;
+                } else if (item.type === 'audio') {
+                    html += `<div class="media-audio p-3 rounded-lg bg-gray-100">
+                                <i class="fas fa-music mr-2"></i>${item.name.substring(0, 10)}...
+                                <audio src="${item.url}" controls class="w-full mt-2"></audio>
+                             </div>`;
+                } else {
+                    html += `<div class="media-file p-3 rounded-lg bg-gray-100">
+                                <i class="fas fa-file mr-2"></i>${item.name.substring(0, 10)}...
+                                <a href="${item.url}" download="${item.name}" class="text-indigo-600 text-sm block mt-2">下载文件</a>
+                             </div>`;
+                }
+                html += '</div>';
+            });
+            html += '</div>';
+            return html;
+        }
+
+        // 渲染用户帖子
+        function renderUserPosts() {
+            const userPostsContainer = document.getElementById('userPostsContainer');
+            userPostsContainer.innerHTML = '';
+
+            // 获取当前用户的所有帖子
+            const userPosts = allPosts.filter(post => post.author === userData.username);
+
+            if (userPosts.length === 0) {
+                userPostsContainer.innerHTML = `
+                    <div class="glassmorphism p-6 text-center text-gray-500">
+                        <i class="fas fa-feather-alt text-4xl mb-4 text-indigo-400"></i>
+                        <p>您还没有发布过帖子，快来分享您的次元想法吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            userPosts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'glassmorphism p-6 mb-6 post-card';
+                postElement.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <img src="${userData.avatar}" alt="用户头像" class="w-10 h-10 rounded-full mr-3 border border-white">
+                        <div>
+                            <p class="font-medium text-gray-800">${post.author}</p>
+                            <p class="text-xs text-gray-500">${post.time}</p>
+                        </div>
+                    </div>
+                    ${post.content ? `<p class="text-gray-700 mb-4">${post.content}</p>` : ''}
+                    ${post.src ? `<img src="${post.src}" alt="帖子图片" class="w-full h-48 object-cover rounded-lg mb-4 post-image">` : ''}
+                    ${renderMediaPreview(post.media)}
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-4">
+                            <button class="flex items-center text-gray-500 hover:text-red-500">
+                                <i class="far fa-heart mr-1"></i>
+                                <span>${post.heart}</span>
+                            </button>
+                            <button onclick="showCommentModal('${post.id}')" class="flex items-center text-gray-500 hover:text-indigo-500">
+                                <i class="far fa-comment mr-1"></i>
+                                <span>${post.comment}</span>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editPost('${post.id}')" class="text-gray-500 hover:text-indigo-500">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deletePost('${post.id}')" class="text-gray-500 hover:text-red-500">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                userPostsContainer.appendChild(postElement);
+            });
+        }
+
+        // 渲染喜欢的帖子
+        function renderLikedPosts() {
+            const likedPostsContainer = document.getElementById('likedPostsContainer');
+            likedPostsContainer.innerHTML = '';
+
+            if (userData.likedPosts.length === 0) {
+                likedPostsContainer.innerHTML = `
+                    <div class="glassmorphism p-6 text-center text-gray-500 empty-state">
+                        <i class="fas fa-heart text-4xl mb-4 text-pink-400"></i>
+                        <p>您还没有喜欢的帖子</p>
+                        <p class="text-sm mt-2">在首页浏览并点赞喜欢的帖子吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            userData.likedPosts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'glassmorphism p-6 card-hover post-card profile-post-card';
+                postElement.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <img src="${post.srcHeader}" alt="用户头像" class="w-10 h-10 rounded-full mr-3 border border-white">
+                        <div>
+                            <p class="font-medium text-gray-800">${post.author}</p>
+                            <p class="text-xs text-gray-500">${post.time}</p>
+                        </div>
+                    </div>
+                    ${post.content ? `<p class="text-gray-700 mb-4">${post.content}</p>` : ''}
+                    ${post.src ? `<img src="${post.src}" alt="帖子图片" class="w-full h-48 object-cover rounded-lg mb-4 post-image">` : ''}
+                    ${renderMediaPreview(post.media)}
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-4">
+                            <button class="flex items-center text-red-500">
+                                <i class="fas fa-heart mr-1"></i>
+                                <span>${post.heart}</span>
+                            </button>
+                            <button onclick="showCommentModal('${post.id}')" class="flex items-center text-gray-500 hover:text-indigo-500">
+                                <i class="far fa-comment mr-1"></i>
+                                <span>${post.comment}</span>
+                            </button>
+                        </div>
+                        <button onclick="toggleFavorite(this, '${post.id}')" class="text-gray-500 hover:text-yellow-500 favorite-btn ${userData.favoritePosts.some(p => p.id === post.id) ? 'active' : ''}">
+                            <i class="${userData.favoritePosts.some(p => p.id === post.id) ? 'fas text-yellow-500' : 'far'} fa-bookmark"></i>
+                        </button>
+                    </div>
+                `;
+                likedPostsContainer.appendChild(postElement);
+            });
+        }
+        
+        // 渲染收藏的帖子
+        function renderFavoritePosts() {
+            const favoritePostsContainer = document.getElementById('favoritePostsContainer');
+            favoritePostsContainer.innerHTML = '';
+
+            if (userData.favoritePosts.length === 0) {
+                favoritePostsContainer.innerHTML = `
+                    <div class="glassmorphism p-6 text-center text-gray-500 empty-state">
+                        <i class="fas fa-bookmark text-4xl mb-4 text-blue-400"></i>
+                        <p>您还没有收藏的帖子</p>
+                        <p class="text-sm mt-2">在首页浏览并收藏喜欢的帖子吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            userData.favoritePosts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'glassmorphism p-6 card-hover post-card profile-post-card';
+                postElement.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <img src="${post.srcHeader}" alt="用户头像" class="w-10 h-10 rounded-full mr-3 border border-white">
+                        <div>
+                            <p class="font-medium text-gray-800">${post.author}</p>
+                            <p class="text-xs text-gray-500">${post.time}</p>
+                        </div>
+                    </div>
+                    ${post.content ? `<p class="text-gray-700 mb-4">${post.content}</p>` : ''}
+                    ${post.src ? `<img src="${post.src}" alt="帖子图片" class="w-full h-48 object-cover rounded-lg mb-4 post-image">` : ''}
+                    ${renderMediaPreview(post.media)}
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-4">
+                            <button onclick="toggleLike(this, '${post.id}')" class="flex items-center text-gray-500 hover:text-red-500 heart-btn ${userData.likedPosts.some(p => p.id === post.id) ? 'active' : ''}">
+                                <i class="${userData.likedPosts.some(p => p.id === post.id) ? 'fas text-red-500' : 'far'} fa-heart mr-1"></i>
+                                <span>${post.heart}</span>
+                            </button>
+                            <button onclick="showCommentModal('${post.id}')" class="flex items-center text-gray-500 hover:text-indigo-500 comment-btn">
+                                <i class="far fa-comment mr-1"></i>
+                                <span>${post.comment}</span>
+                            </button>
+                        </div>
+                        <button onclick="toggleFavorite(this, '${post.id}')" class="text-gray-500 hover:text-yellow-500 favorite-btn active">
+                            <i class="fas text-yellow-500 fa-bookmark"></i>
+                        </button>
+                    </div>
+                `;
+                favoritePostsContainer.appendChild(postElement);
+            });
+        }
+        
+        // 渲染好友列表
+        function renderFriendsList() {
+            const friendsList = document.getElementById('friendsList');
+            friendsList.innerHTML = '';
+            
+            if (userData.following.length === 0) {
+                friendsList.innerHTML = `
+                    <div class="glassmorphism p-6 text-center text-gray-500 empty-state">
+                        <i class="fas fa-user-friends text-4xl mb-4 text-indigo-400"></i>
+                        <p>您还没有关注任何用户</p>
+                        <p class="text-sm mt-2">在首页或推荐好友中关注感兴趣的同好吧！</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            userData.following.forEach(friend => {
+                const friendInfo = mockUsers.find(u => u.username === friend);
+                if (!friendInfo) return;
+                
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-item';
+                friendElement.innerHTML = `
+                    <img src="${friendInfo.avatar}" alt="${friendInfo.username}的头像">
+                    <div class="friend-info">
+                        <p class="font-medium">${friendInfo.username}</p>
+                        <p class="text-xs text-gray-500">动漫爱好者</p>
+                    </div>
+                    <div class="friend-actions">
+                        <button onclick="showMessageModal('${friendInfo.username}')" class="friend-action-btn message-btn">
+                            <i class="fas fa-comment"></i> 发消息
+                        </button>
+                        <button onclick="toggleFollow('${friendInfo.username}')" class="friend-action-btn unfollow-btn">
+                            取消关注
+                        </button>
+                    </div>
+                `;
+                friendsList.appendChild(friendElement);
+            });
+        }
+        
+        // 渲染推荐好友
+        function renderSuggestedFriends() {
+            const suggestedFriends = document.getElementById('suggestedFriends');
+            suggestedFriends.innerHTML = '';
+            
+            // 排除当前用户和已关注的用户
+            const suggested = mockUsers.filter(user => 
+                user.username !== userData.username && 
+                !userData.following.includes(user.username)
+            ).slice(0, 3); // 只取前3个
+
+            if (suggested.length === 0) {
+                suggestedFriends.innerHTML = `
+                    <div class="glassmorphism p-4 text-center text-gray-500 empty-state">
+                        <p>暂无更多推荐好友</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            suggested.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-item';
+                friendElement.innerHTML = `
+                    <img src="${friend.avatar}" alt="${friend.username}的头像">
+                    <div class="friend-info">
+                        <p class="font-medium">${friend.username}</p>
+                        <p class="text-xs text-gray-500">动漫爱好者</p>
+                    </div>
+                    <div class="friend-actions">
+                        <button onclick="toggleFollow('${friend.username}')" class="friend-action-btn follow-btn">
+                            关注
+                        </button>
+                    </div>
+                `;
+                suggestedFriends.appendChild(friendElement);
+            });
+        }
+
+        // 删除帖子
+        function deletePost(postId) {
+            if (confirm('确定要删除这条帖子吗？')) {
+                // 从内存中删除帖子
+                allPosts = allPosts.filter(post => post.id !== postId);
+                
+                // 更新 UI
+                renderPosts();
+                renderUserPosts();
+                renderLikedPosts();
+                renderFavoritePosts();
+            }
+        }
+
+        // 编辑帖子
+        function editPost(postId) {
+            const post = allPosts.find(p => p.id === postId);
+            if (!post) return;
+            
+            currentEditPostId = postId;
+            document.getElementById('editPostContent').value = post.content;
+            
+            const preview = document.getElementById('editMediaPreview');
+            preview.innerHTML = '';
+            
+            // 显示媒体预览
+            if (post.media && post.media.length > 0) {
+                post.media.forEach(item => {
+                    const mediaItem = document.createElement('div');
+                    mediaItem.className = 'media-item';
+                    
+                    let mediaElement;
+                    if (item.type === 'image') {
+                        mediaElement = document.createElement('img');
+                        mediaElement.className = 'media-image';
+                        mediaElement.src = item.url;
+                    } else if (item.type === 'video') {
+                        mediaElement = document.createElement('video');
+                        mediaElement.className = 'media-video';
+                        mediaElement.src = item.url;
+                        mediaElement.controls = true;
+                    } else if (item.type === 'audio') {
+                        mediaElement = document.createElement('div');
+                        mediaElement.className = 'media-audio';
+                        mediaElement.innerHTML = `<i class="fas fa-music mr-2"></i>${item.name.substring(0, 10)}...`;
+                    } else {
+                        mediaElement = document.createElement('div');
+                        mediaElement.className = 'media-file';
+                        mediaElement.innerHTML = `<i class="fas fa-file mr-2"></i>${item.name.substring(0, 10)}...`;
+                    }
+                    
+                    mediaItem.appendChild(mediaElement);
+                    preview.appendChild(mediaItem);
+                });
+            }
+            
+            document.getElementById('editPostModal').classList.remove('hidden');
+        }
+
+        // 保存编辑后的帖子
+        function saveEditedPost() {
+            if (!currentEditPostId) return;
+            
+            const content = document.getElementById('editPostContent').value;
+            if (!content) {
+                alert('帖子内容不能为空');
+                return;
+            }
+            
+            // 更新帖子内容
+            const postIndex = allPosts.findIndex(p => p.id === currentEditPostId);
+            if (postIndex !== -1) {
+                allPosts[postIndex].content = content;
+                
+                // 隐藏编辑模态框
+                hideEditModal();
+                
+                // 更新 UI
+                renderPosts();
+                renderUserPosts();
+            }
+        }
+
+        // 隐藏编辑模态框
+        function hideEditModal() {
+            document.getElementById('editPostModal').classList.add('hidden');
+            currentEditPostId = null;
+        }
+        
+        // 显示评论模态框
+        function showCommentModal(postId) {
+            currentCommentPostId = postId;
+            const post = allPosts.find(p => p.id === postId);
+            if (!post) return;
+            
+            const commentContent = document.getElementById('commentContent');
+            const commentSection = document.getElementById('commentSection');
+            
+            // 渲染帖子内容
+            commentContent.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <img src="${post.srcHeader}" alt="用户头像" class="w-10 h-10 rounded-full mr-3 border border-white">
+                    <div>
+                        <p class="font-medium text-gray-800">${post.author}</p>
+                        <p class="text-xs text-gray-500">${post.time}</p>
+                    </div>
+                </div>
+                ${post.content ? `<p class="text-gray-700 mb-4">${post.content}</p>` : ''}
+                ${post.src ? `<img src="${post.src}" alt="帖子图片" class="w-full h-48 object-cover rounded-lg mb-4">` : ''}
+            `;
+            
+            // 渲染评论列表
+            commentSection.innerHTML = '';
+            if (post.comments && post.comments.length > 0) {
+                post.comments.forEach(comment => {
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment';
+                    commentElement.innerHTML = `
+                        <div class="flex items-start">
+                            <img src="${comment.src}" alt="用户头像" class="w-8 h-8 rounded-full mr-3">
+                            <div>
+                                <p class="font-medium text-gray-800">${comment.uname}</p>
+                                <p class="text-gray-700">${comment.comment}</p>
+                                <p class="text-xs text-gray-500">${comment.time}</p>
+                            </div>
+                        </div>
+                    `;
+                    commentSection.appendChild(commentElement);
+                });
+            } 
+            
+            document.getElementById('commentModal').classList.remove('hidden');
+            document.getElementById('newComment').value = '';
+        }
+        
+        // 隐藏评论模态框
+        function hideCommentModal() {
+            document.getElementById('commentModal').classList.add('hidden');
+            currentCommentPostId = null;
+        }
+        
+        // 添加评论
+function addComment() {
+    if (!userData.username) {
+        alert('请先登录后再评论');
+        return;
+    }
+    
+    const commentText = document.getElementById('newComment').value;
+    if (!commentText) {
+        alert('请输入评论内容');
+        return;
+    }
+    
+    const post = allPosts.find(p => p.id === currentCommentPostId);
+    if (!post) return;
+    
+    const newComment = {
+        id: `comment-${Date.now()}`,
+        src: userData.avatar,
+        uname: userData.username,
+        comment: commentText,
+        time: '刚刚'
+    };
+    
+    // 更新帖子评论
+    post.comments.push(newComment);
+    post.comment = post.comments.length.toString(); // 更新评论数
+    
+    // 更新评论显示
+    const commentSection = document.getElementById('commentSection');
+    const commentElement = document.createElement('div');
+    commentElement.className = 'comment';
+    commentElement.innerHTML = `
+        <div class="flex items-start">
+            <img src="${newComment.src}" alt="用户头像" class="w-8 h-8 rounded-full mr-3">
+            <div>
+                <p class="font-medium text-gray-800">${newComment.uname}</p>
+                <p class="text-gray-700">${newComment.comment}</p>
+                <p class="text-xs text-gray-500">${newComment.time}</p>
+            </div>
+        </div>
+    `;
+    commentSection.appendChild(commentElement);
+    
+    // 清空输入框
+    document.getElementById('newComment').value = '';
+    
+    // 滚动到底部
+    commentSection.scrollTop = commentSection.scrollHeight;
+    
+    // 更新"我喜欢的"帖子列表
+    renderLikedPosts();
+    
+    // 更新帖子列表中的评论数
+    renderPosts();
+}
+        // 切换标签页
+        function switchTab(tabId) {
+            document.querySelectorAll('.flex.border-b button').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-gray-600', 'hover:text-indigo-600');
+            });
+            
+            if (event.target.textContent !== '返回首页') {
+                event.target.classList.add('active-tab');
+                event.target.classList.remove('text-gray-600', 'hover:text-indigo-600');
+            }
+            
+            document.getElementById('myPosts').classList.add('hidden');
+            document.getElementById('likedPosts').classList.add('hidden');
+            document.getElementById('favoritePosts').classList.add('hidden');
+            document.getElementById('friendsTab').classList.add('hidden');
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            if (tabId === 'likedPosts') {
+                renderLikedPosts();
+            } else if (tabId === 'favoritePosts') {
+                renderFavoritePosts();
+            } else if (tabId === 'friendsTab') {
+                renderFriendsList();
+                renderSuggestedFriends();
+            }
+        }
+
+        // 筛选帖子
+        function filterPosts(category) {
+            currentFilter = category;
+            renderPosts();
+            
+            // 更新按钮样式
+            document.querySelectorAll('.flex.overflow-x-auto button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+        }
+
+        // 点赞功能
+        function toggleLike(button, postId) {
+            if (!userData.username) {
+                alert('请先登录后再点赞');
+                return;
+            }
+            
+            const icon = button.querySelector('i');
+            const countSpan = button.querySelector('span');
+            const post = allPosts.find(p => p.id === postId);
+            
+            if (!post) return;
+            
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-red-500');
+                countSpan.textContent = (parseInt(countSpan.textContent) + 1).toString();
+                
+                // 添加到喜欢的帖子
+                if (!userData.likedPosts.some(p => p.id === postId)) {
+                    userData.likedPosts.push(post);
+                }
+                
+                // 更新帖子点赞数
+                post.heart = countSpan.textContent;
+            } else {
+                icon.classList.remove('fas', 'text-red-500');
+                icon.classList.add('far');
+                countSpan.textContent = (parseInt(countSpan.textContent) - 1).toString();
+                
+                // 从喜欢的帖子中移除
+                userData.likedPosts = userData.likedPosts.filter(p => p.id !== postId);
+                
+                // 更新帖子点赞数
+                post.heart = countSpan.textContent;
+            }
+            
+            // 更新 UI
+            renderLikedPosts();
+        }
+
+        // 收藏功能
+function toggleFavorite(button, postId) {
+    if (!userData.username) {
+        alert('请先登录后再收藏');
+        return;
+    }
+
+    const icon = button.querySelector('i');
+    const post = allPosts.find(p => p.id === postId);
+    
+    if (!post) return;
+    
+    if (icon.classList.contains('far')) {
+        icon.classList.remove('far');
+        icon.classList.add('fas', 'text-yellow-500'); // 确保这里使用黄色
+        if (!userData.favoritePosts.some(p => p.id === postId)) {
+            userData.favoritePosts.push(post);
+        }
+    } else {
+        icon.classList.remove('fas', 'text-yellow-500'); // 确保这里移除黄色
+        icon.classList.add('far');
+        userData.favoritePosts = userData.favoritePosts.filter(p => p.id !== postId);
+    }
+    
+    renderFavoritePosts();
+}
+        
+        // 关注/取消关注用户
+        function toggleFollow(username) {
+            if (!userData.username) {
+                alert('请先登录后再关注用户');
+                return;
+            }
+            
+            if (userData.username === username) {
+                alert('不能关注自己');
+                return;
+            }
+            
+            // 更新当前用户数据
+            if (userData.following.includes(username)) {
+                userData.following = userData.following.filter(u => u !== username);
+                alert(`已取消关注 ${username}`);
+            } else {
+                userData.following.push(username);
+                alert(`已关注 ${username}`);
+            }
+            
+            // 更新 UI
+            renderPosts();
+            renderFriendsList();
+            renderSuggestedFriends();
+        }
+        
+        // 显示消息模态框
+        function showMessageModal(friendName) {
+            if (!userData.username) {
+                alert('请先登录');
+                return;
+            }
+            
+            currentFriend = friendName;
+            document.getElementById('messageFriendName').textContent = `与 ${friendName} 聊天`;
+            
+            // 初始化消息
+            if (!userData.messages[friendName]) {
+                userData.messages[friendName] = [
+                    {
+                        from: 'system',
+                        text: '你们已成为好友，现在可以开始聊天了',
+                        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    }
+                ];
+            }
+            
+            renderMessages();
+            document.getElementById('messageModal').classList.remove('hidden');
+            document.getElementById('messageInput').value = '';
+            document.getElementById('messageInput').focus();
+        }
+        
+        // 隐藏消息模态框
+        function hideMessageModal() {
+            document.getElementById('messageModal').classList.add('hidden');
+            currentFriend = null;
+        }
+        
+        // 渲染消息
+        function renderMessages() {
+            if (!currentFriend) return;
+            
+            const messageContent = document.getElementById('messageContent');
+            messageContent.innerHTML = '';
+            
+            const messages = userData.messages[currentFriend] || [];
+            
+            messages.forEach(msg => {
+                if (msg.from === 'system') {
+                    const systemMsg = document.createElement('div');
+                    systemMsg.className = 'text-center text-gray-500 text-sm my-4';
+                    systemMsg.textContent = msg.text;
+                    messageContent.appendChild(systemMsg);
+                    return;
+                }
+                
+                const isSent = msg.from === userData.username;
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'message-bubble';
+                bubbleDiv.textContent = msg.text;
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = msg.time;
+                
+                messageDiv.appendChild(bubbleDiv);
+                messageDiv.appendChild(timeDiv);
+                messageContent.appendChild(messageDiv);
+            });
+            
+            // 滚动到底部
+            messageContent.scrollTop = messageContent.scrollHeight;
+        }
+        
+        // 发送消息
+        function sendMessage() {
+            if (!currentFriend || !userData.username) return;
+            
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            // 添加消息
+            const newMessage = {
+                from: userData.username,
+                text: text,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            // 更新用户消息数据
+            if (!userData.messages[currentFriend]) {
+                userData.messages[currentFriend] = [];
+            }
+            userData.messages[currentFriend].push(newMessage);
+            
+            // 更新 UI
+            renderMessages();
+            input.value = '';
+            input.focus();
+        }
+    </script>
+</body>
+</html>
